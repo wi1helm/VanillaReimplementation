@@ -6,34 +6,35 @@ import net.kyori.adventure.text.format.TextDecoration;
 import net.minestom.server.command.CommandSender;
 import net.minestom.server.command.builder.Command;
 import net.minestom.server.command.builder.CommandContext;
-import net.minestom.server.command.builder.arguments.ArgumentEnum;
 import net.minestom.server.command.builder.arguments.ArgumentType;
+import net.minestom.server.command.builder.arguments.ArgumentWord;
 import net.minestom.vanilla.commands.VanillaCommand;
 import net.minestom.vanilla.commands.VanillaCommandsFeature;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Supplier;
 
 /**
  * Returns the list of all available commands
  */
-public class HelpCommand extends Command implements VanillaCommand {
+public class HelpCommand extends VanillaCommand {
     public HelpCommand() {
         super("help");
 
         setCondition(permission(LEVEL_ALL));
 
         setDefaultExecutor(this::defaultor);
-
-        ArgumentEnum<VanillaCommandsFeature> command = ArgumentType.Enum("command", VanillaCommandsFeature.class).setFormat(ArgumentEnum.Format.LOWER_CASED);
+        ArgumentWord command = ArgumentType.Word("command").from(VanillaCommandsFeature.getRegisteredCommandNames().toArray(String[]::new)); // sets autocomplete suggestions
 
         addSyntax((sender, context) -> {
-            VanillaCommandsFeature vanillaCommandsFeature = context.get(command);
-
-            viewUsage(sender, context, vanillaCommandsFeature.getCommand());
+            String vanillaCommandName = context.get(command);
+            
+            viewUsage(sender, context, VanillaCommandsFeature.getCommandFromName(vanillaCommandName));
 
         }, command);
 
@@ -54,29 +55,25 @@ public class HelpCommand extends Command implements VanillaCommand {
         sender.sendMessage(usage);
     }
 
-    private int compareCommands(VanillaCommandsFeature a, VanillaCommandsFeature b) {
-        return a.name().compareTo(b.name());
+    private int compareCommands(VanillaCommand a, VanillaCommand b) {
+        return a.getName().compareTo(b.getName());
     }
 
-    @Override
     public Component usage(CommandSender sender, CommandContext context) {
         return Component.text("/help [<command>]");
     }
 
-    @Override
     public void defaultor(CommandSender sender, CommandContext context) {
 
-        if (!hasArguments(context)) {
+        if (hasNoArguments(context)) {
 
             sender.sendMessage("=== Help ===");
 
-            List<VanillaCommandsFeature> commands = new ArrayList<>();
-
-            Collections.addAll(commands, VanillaCommandsFeature.values());
+            List<VanillaCommand> commands = new ArrayList<>(VanillaCommandsFeature.getRegisteredCommands().values());
 
             commands.sort(this::compareCommands);
 
-            commands.forEach(command -> sender.sendMessage("/" + command.name().toLowerCase()));
+            commands.forEach(command -> sender.sendMessage("/" + command.getName().toLowerCase()));
 
             sender.sendMessage("============");
 

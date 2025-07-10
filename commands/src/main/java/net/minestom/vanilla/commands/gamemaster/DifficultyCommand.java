@@ -7,21 +7,15 @@ import net.minestom.server.MinecraftServer;
 import net.minestom.server.command.CommandSender;
 import net.minestom.server.command.builder.Command;
 import net.minestom.server.command.builder.CommandContext;
-import net.minestom.server.command.builder.arguments.Argument;
 import net.minestom.server.command.builder.arguments.ArgumentEnum;
 import net.minestom.server.command.builder.arguments.ArgumentType;
-import net.minestom.server.command.builder.exception.ArgumentSyntaxException;
-import net.minestom.server.utils.StringUtils;
 import net.minestom.server.world.Difficulty;
 import net.minestom.vanilla.commands.VanillaCommand;
-import net.minestom.vanilla.logging.Logger;
-import org.jetbrains.annotations.NotNull;
-import org.slf4j.LoggerFactory;
 
 /**
  * Command that make an instance change difficulty
  */
-public class DifficultyCommand extends Command implements VanillaCommand {
+public class DifficultyCommand extends VanillaCommand {
 
     public DifficultyCommand() {
         super("difficulty");
@@ -51,7 +45,7 @@ public class DifficultyCommand extends Command implements VanillaCommand {
 
     @Override
     public void defaultor(CommandSender sender, CommandContext context) {
-        if (!hasArguments(context)) {
+        if (hasNoArguments(context)) {
             setDifficulty(sender, Difficulty.EASY);
             return;
         }

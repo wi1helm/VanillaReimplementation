@@ -10,7 +10,7 @@ import net.minestom.vanilla.commands.VanillaCommand;
 /**
  * Stops the server
  */
-public class StopCommand extends Command implements VanillaCommand {
+public class StopCommand extends VanillaCommand {
     public StopCommand() {
         super("stop");
         setCondition(permission(LEVEL_OWNER));

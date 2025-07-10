@@ -8,52 +8,71 @@ import net.minestom.vanilla.commands.all.MeCommand;
 import net.minestom.vanilla.commands.gamemaster.*;
 import net.minestom.vanilla.commands.owner.SaveAllCommand;
 import net.minestom.vanilla.commands.owner.StopCommand;
+import net.minestom.vanilla.logging.Logger;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Supplier;
 
 /**
  * All commands available in the vanilla reimplementation
  */
-public enum VanillaCommandsFeature {
+public final class VanillaCommandsFeature {
 
-    OP(OpCommand::new),
-    DIFFICULTY(DifficultyCommand::new),
-    GAMEMODE(GamemodeCommand::new),
-    HELP(HelpCommand::new),
-    STOP(StopCommand::new),
-    ME(MeCommand::new),
-    SAVEALL(SaveAllCommand::new),
-    FORCELOAD(ForceloadCommand::new),
-    LIST(ListCommand::new),
-    SAY(SayCommand::new)
-    ;
+    private static final Map<String, Supplier<VanillaCommand>> registeredCommands = new HashMap<>();
 
-    private static final Logger log = LoggerFactory.getLogger(VanillaCommandsFeature.class);
-    private final Supplier<Command> commandCreator;
+    private static final List<Supplier<VanillaCommand>> COMMANDS = List.of(
+            OpCommand::new,
+            DifficultyCommand::new,
+            GamemodeCommand::new,
+            HelpCommand::new,
+            StopCommand::new,
+            MeCommand::new,
+            SaveAllCommand::new,
+            ForceloadCommand::new,
+            ListCommand::new,
+            SayCommand::new
+    );
 
-    VanillaCommandsFeature(Supplier<Command> commandCreator) {
-        this.commandCreator = commandCreator;
-    }
-
-    /**
-     * Register all vanilla commands into the given manager
-     *
-     * @param manager the command manager to register commands on
-     */
     public static void registerAll(@NotNull CommandManager manager) {
-        for (VanillaCommandsFeature vanillaCommand : values()) {
-            Command command = vanillaCommand.commandCreator.get();
+        for (Supplier<VanillaCommand> commandSupplier : COMMANDS) {
+            Command command = commandSupplier.get();
+            registeredCommands.put(command.getName(), commandSupplier);
             manager.register(command);
         }
-        log.info("Registered {} vanilla commands", VanillaCommandsFeature.values().length);
+        Logger.info("Registered {} vanilla commands", COMMANDS.size());
     }
 
-    public @Nullable VanillaCommand getCommand() {
-        if (this.commandCreator.get() instanceof VanillaCommand vc) return vc;
-        return null;
+    public static List<String> getRegisteredCommandNames() {
+        return COMMANDS.stream()
+                .map(Supplier::get)
+                .flatMap(command -> Arrays.stream(command.getNames()))
+                .distinct()
+                .toList();
     }
+
+    public static Map<String, VanillaCommand> getRegisteredCommands() {
+        Map<String, VanillaCommand> map = new HashMap<>();
+
+        for (Supplier<VanillaCommand> supplier : COMMANDS) {
+            Command command = supplier.get();
+
+            if (command instanceof VanillaCommand vanillaCommand) {
+                for (String name : command.getNames()) {
+                    map.put(name.toLowerCase(), vanillaCommand);
+                }
+            }
+        }
+
+        return map;
+    }
+
+    public static VanillaCommand getCommandFromName(String name) {
+        return registeredCommands.get(name).get();
+    }
+
+
 }

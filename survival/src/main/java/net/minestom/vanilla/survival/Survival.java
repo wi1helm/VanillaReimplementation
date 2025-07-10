@@ -75,6 +75,7 @@ public class Survival {
         Map<Key, Recipe> recipes = CraftingFeature.buildFromDatapack(process);
         process.eventHandler().addChild(CraftingFeature.createEventNode(recipes, process));
 
+
         VanillaCommandsFeature.registerAll(process.command());
 
         process.eventHandler().addListener(AsyncPlayerConfigurationEvent.class, event -> {

@@ -16,7 +16,7 @@ import net.minestom.vanilla.commands.VanillaCommand;
 /**
  * Command that displays a player action
  */
-public class SayCommand extends Command implements VanillaCommand {
+public class SayCommand extends VanillaCommand {
     public SayCommand() {
         super("say");
 

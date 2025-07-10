@@ -11,7 +11,7 @@ import net.minestom.vanilla.logging.Logger;
 /**
  * Save the server
  */
-public class SaveAllCommand extends Command implements VanillaCommand {
+public class SaveAllCommand extends VanillaCommand {
     public SaveAllCommand() {
         super("save-all");
         setCondition(permission(LEVEL_OWNER));

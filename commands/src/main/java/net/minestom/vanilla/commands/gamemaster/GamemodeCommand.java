@@ -4,7 +4,6 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.minestom.server.command.CommandSender;
-import net.minestom.server.command.ConsoleSender;
 import net.minestom.server.command.builder.Command;
 import net.minestom.server.command.builder.CommandContext;
 import net.minestom.server.command.builder.arguments.ArgumentEnum;
@@ -13,12 +12,9 @@ import net.minestom.server.command.builder.arguments.minecraft.ArgumentEntity;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.GameMode;
 import net.minestom.server.entity.Player;
-import net.minestom.server.utils.entity.EntityFinder;
 import net.minestom.vanilla.commands.VanillaCommand;
 
-import java.util.Arrays;
 import java.util.List;
-import java.util.Locale;
 
 /**
  * Command that make a player change gamemode, made in
@@ -26,7 +22,7 @@ import java.util.Locale;
  *
  * @see <a href="https://minecraft.fandom.com/wiki/Commands/gamemode">...</a>
  */
-public class GamemodeCommand extends Command implements VanillaCommand {
+public class GamemodeCommand extends VanillaCommand {
 
     public GamemodeCommand() {
         super("gamemode");
@@ -66,7 +62,7 @@ public class GamemodeCommand extends Command implements VanillaCommand {
     @Override
     public void defaultor(CommandSender sender, CommandContext context) {
 
-        if (!hasArguments(context)) {
+        if (hasNoArguments(context)) {
             sender.sendMessage(Component.text("Unknown or incomplete command").color(NamedTextColor.RED)
                     .appendNewline()
                     .append(Component.text(context.getInput().replace(context.getCommandName() + " ","")).color(NamedTextColor.GRAY)

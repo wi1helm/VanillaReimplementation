@@ -17,7 +17,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-public class OpCommand extends Command implements VanillaCommand {
+public class OpCommand extends VanillaCommand {
     public OpCommand() {
         super("op");
 

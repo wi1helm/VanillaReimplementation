@@ -28,7 +28,7 @@ import java.util.List;
  * BE_EE_OP_Level: 0
  * MP_Only: false
  */
-public class ForceloadCommand extends Command implements VanillaCommand {
+public class ForceloadCommand extends VanillaCommand {
 
     public ForceloadCommand() {
         super("forceload");
