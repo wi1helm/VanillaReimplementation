@@ -1,36 +1,59 @@
 package net.minestom.vanilla.commands;
 
-
-import net.kyori.adventure.key.Key;
-import net.minestom.vanilla.VanillaReimplementation;
-import net.minestom.vanilla.instancemeta.InstanceMetaFeature;
+import net.minestom.server.command.CommandManager;
+import net.minestom.server.command.builder.Command;
+import net.minestom.vanilla.commands.all.HelpCommand;
+import net.minestom.vanilla.commands.all.ListCommand;
+import net.minestom.vanilla.commands.all.MeCommand;
+import net.minestom.vanilla.commands.gamemaster.*;
+import net.minestom.vanilla.commands.owner.SaveAllCommand;
+import net.minestom.vanilla.commands.owner.StopCommand;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.util.Set;
+import java.util.function.Supplier;
 
-public class VanillaCommandsFeature implements VanillaReimplementation.Feature {
+/**
+ * All commands available in the vanilla reimplementation
+ */
+public enum VanillaCommandsFeature {
 
-    @Override
-    public void hook(@NotNull HookContext context) {
-        new Logic().hook(context.vri());
+    OP(OpCommand::new),
+    DIFFICULTY(DifficultyCommand::new),
+    GAMEMODE(GamemodeCommand::new),
+    HELP(HelpCommand::new),
+    STOP(StopCommand::new),
+    ME(MeCommand::new),
+    SAVEALL(SaveAllCommand::new),
+    FORCELOAD(ForceloadCommand::new),
+    LIST(ListCommand::new),
+    SAY(SayCommand::new)
+    ;
+
+    private static final Logger log = LoggerFactory.getLogger(VanillaCommandsFeature.class);
+    private final Supplier<Command> commandCreator;
+
+    VanillaCommandsFeature(Supplier<Command> commandCreator) {
+        this.commandCreator = commandCreator;
     }
 
-    @Override
-    public @NotNull Key key() {
-        return Key.key("vri:commands");
-    }
-
-    private static class Logic {
-        private Logic() {
+    /**
+     * Register all vanilla commands into the given manager
+     *
+     * @param manager the command manager to register commands on
+     */
+    public static void registerAll(@NotNull CommandManager manager) {
+        for (VanillaCommandsFeature vanillaCommand : values()) {
+            Command command = vanillaCommand.commandCreator.get();
+            manager.register(command);
         }
-
-        private void hook(@NotNull VanillaReimplementation vri) {
-            VanillaCommands.registerAll(vri.process().command());
-        }
+        log.info("Registered {} vanilla commands", VanillaCommandsFeature.values().length);
     }
 
-    @Override
-    public @NotNull Set<Class<? extends VanillaReimplementation.Feature>> dependencies() {
-        return Set.of(InstanceMetaFeature.class);
+    public @Nullable VanillaCommand getCommand() {
+        if (this.commandCreator.get() instanceof VanillaCommand vc) return vc;
+        return null;
     }
 }
