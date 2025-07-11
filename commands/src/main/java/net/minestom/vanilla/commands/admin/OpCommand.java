@@ -1,26 +1,23 @@
-package net.minestom.vanilla.commands.gamemaster;
+package net.minestom.vanilla.commands.admin;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.minestom.server.MinecraftServer;
-import net.minestom.server.adventure.audience.Audiences;
 import net.minestom.server.command.CommandSender;
-import net.minestom.server.command.builder.Command;
 import net.minestom.server.command.builder.CommandContext;
 import net.minestom.server.command.builder.arguments.ArgumentType;
 import net.minestom.server.command.builder.arguments.minecraft.ArgumentEntity;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.Player;
 import net.minestom.vanilla.commands.VanillaCommand;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
 public class OpCommand extends VanillaCommand {
     public OpCommand() {
         super("op");
-
+        //TODO set correct permission Level. But due a lack of console to otherwise run op, we place it for all.
         setCondition(permission(LEVEL_ALL));
 
         ArgumentEntity target = ArgumentType.Entity("target").onlyPlayers(true);

@@ -3,7 +3,6 @@ package net.minestom.vanilla.commands.owner;
 import net.kyori.adventure.text.Component;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.command.CommandSender;
-import net.minestom.server.command.builder.Command;
 import net.minestom.server.command.builder.CommandContext;
 import net.minestom.vanilla.commands.VanillaCommand;
 import net.minestom.vanilla.logging.Logger;

@@ -4,7 +4,6 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.minestom.server.command.CommandSender;
-import net.minestom.server.command.builder.Command;
 import net.minestom.server.command.builder.CommandContext;
 import net.minestom.server.command.builder.arguments.ArgumentType;
 import net.minestom.server.command.builder.arguments.ArgumentWord;
@@ -14,10 +13,11 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
+// Not explicitly used but good to keep if needed
 import java.util.List;
-import java.util.function.Supplier;
+// For Objects.requireNonNullElse for better null handling if needed
+// Good practice to include if using streams
+
 
 /**
  * Returns the list of all available commands
@@ -29,27 +29,43 @@ public class HelpCommand extends VanillaCommand {
         setCondition(permission(LEVEL_ALL));
 
         setDefaultExecutor(this::defaultor);
-        ArgumentWord command = ArgumentType.Word("command").from(VanillaCommandsFeature.getRegisteredCommandNames().toArray(String[]::new)); // sets autocomplete suggestions
+
+        ArgumentWord commandArg = ArgumentType.Word("command");
 
         addSyntax((sender, context) -> {
-            String vanillaCommandName = context.get(command);
-            
-            viewUsage(sender, context, VanillaCommandsFeature.getCommandFromName(vanillaCommandName));
+            String commandName = context.get(commandArg);
 
-        }, command);
+            // Attempt to retrieve the command instance
+            VanillaCommand targetCommand = VanillaCommandsFeature.getRegisteredCommands().get(commandName);
 
+            if (targetCommand == null) {
+                sender.sendMessage(Component.text("Unknown command: '").color(NamedTextColor.RED)
+                        .append(Component.text(context.getInput()).color(NamedTextColor.RED).decorate(TextDecoration.UNDERLINED))
+                        .append(Component.text("'")).color(NamedTextColor.RED));
+                return;
+            }
+
+            viewUsage(sender, context, targetCommand);
+
+        }, commandArg); // Associate this executor with the 'commandArg'
     }
 
+    /**
+     * Displays the usage for a specific command.
+     * @param sender The command sender.
+     * @param context The command context.
+     * @param command The VanillaCommand instance whose usage is to be displayed. Can be null if not found.
+     */
     private void viewUsage(@NotNull CommandSender sender, CommandContext context, @Nullable VanillaCommand command) {
-
         if (command == null) {
+            sender.sendMessage(Component.text("Internal error: Command instance is null.").color(NamedTextColor.RED));
             return;
         }
 
         Component usage = command.usage(sender, context);
 
         if (usage == null) {
-            sender.sendMessage(Component.text("Usage not found!").color(NamedTextColor.RED));
+            sender.sendMessage(Component.text("Usage not found for this command.").color(NamedTextColor.RED));
             return;
         }
         sender.sendMessage(usage);
@@ -59,30 +75,29 @@ public class HelpCommand extends VanillaCommand {
         return a.getName().compareTo(b.getName());
     }
 
+    @Override
     public Component usage(CommandSender sender, CommandContext context) {
         return Component.text("/help [<command>]");
     }
 
     public void defaultor(CommandSender sender, CommandContext context) {
-
         if (hasNoArguments(context)) {
 
-            sender.sendMessage("=== Help ===");
+            sender.sendMessage(Component.text("=== Help ==="));
 
             List<VanillaCommand> commands = new ArrayList<>(VanillaCommandsFeature.getRegisteredCommands().values());
 
             commands.sort(this::compareCommands);
 
-            commands.forEach(command -> sender.sendMessage("/" + command.getName().toLowerCase()));
+            commands.forEach(command -> sender.sendMessage(Component.text("/" + command.getName().toLowerCase())));
 
-            sender.sendMessage("============");
+            sender.sendMessage(Component.text("============"));
 
             return;
         }
 
-        sender.sendMessage(Component.text("Unknown command: ").color(NamedTextColor.RED)
-                .append(Component.text(context.getInput().replace(context.getCommandName() + " ","")).color(NamedTextColor.RED).decoration(TextDecoration.UNDERLINED, true)));
-
-
+        sender.sendMessage(Component.text("Unknown command: '").color(NamedTextColor.RED)
+                .append(Component.text(context.getInput()).color(NamedTextColor.RED).decorate(TextDecoration.UNDERLINED))
+                .append(Component.text("'")).color(NamedTextColor.RED));
     }
 }

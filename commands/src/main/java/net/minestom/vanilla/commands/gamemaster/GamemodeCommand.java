@@ -4,7 +4,6 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.minestom.server.command.CommandSender;
-import net.minestom.server.command.builder.Command;
 import net.minestom.server.command.builder.CommandContext;
 import net.minestom.server.command.builder.arguments.ArgumentEnum;
 import net.minestom.server.command.builder.arguments.ArgumentType;
@@ -78,7 +77,7 @@ public class GamemodeCommand extends VanillaCommand {
         if (!(sender instanceof final Player playerSender)) {
             sender.sendMessage(Component.text("When executed from console, targets must be specified.", NamedTextColor.RED));
             return;
-        };
+        }
         setGamemode(playerSender, gameMode);
     }
 
