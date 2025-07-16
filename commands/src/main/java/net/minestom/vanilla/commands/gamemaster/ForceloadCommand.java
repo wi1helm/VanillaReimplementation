@@ -17,16 +17,6 @@ import net.minestom.vanilla.instancemeta.tickets.TicketUtils;
 
 import java.util.List;
 
-/**
- * "forceload":
- * Description: "Forces chunks to constantly be loaded or not. "
- * BE: false
- * EE: false
- * JE: true
- * OP_Level: 2
- * BE_EE_OP_Level: 0
- * MP_Only: false
- */
 public class ForceloadCommand extends VanillaCommand {
 
     public ForceloadCommand() {
