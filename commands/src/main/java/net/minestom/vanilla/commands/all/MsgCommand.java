@@ -9,8 +9,11 @@ import net.minestom.server.command.builder.CommandContext;
 import net.minestom.server.command.builder.arguments.ArgumentString;
 import net.minestom.server.command.builder.arguments.ArgumentType;
 import net.minestom.server.command.builder.arguments.minecraft.ArgumentEntity;
+import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.Player;
 import net.minestom.vanilla.commands.VanillaCommand;
+
+import java.util.List;
 
 public class MsgCommand extends VanillaCommand {
     public MsgCommand() {
@@ -24,27 +27,39 @@ public class MsgCommand extends VanillaCommand {
         ArgumentString messageArg = ArgumentType.String("message");
 
         addSyntax((sender, context) -> {
-            Player player = context.get(targetArg).findFirstPlayer(sender);
+            List<Entity> receivers = context.get(targetArg).find(sender);
             String message = context.get(messageArg);
 
-            if (player == null) {
-                sender.sendMessage(Component.text("No player was found", NamedTextColor.RED));
+            whisperTo(sender, receivers, message);
+
+        }, targetArg, messageArg);
+
+
+    }
+
+    private void whisperTo(CommandSender sender, List<Entity> receivers, String message) {
+
+        if (receivers.isEmpty()) {
+            sender.sendMessage(Component.text("No player was found", NamedTextColor.RED));
+            return;
+        }
+
+        receivers.forEach(entity -> {
+            if (!(entity instanceof Player player)) {
                 return;
             }
 
-            String targetName = player.getUsername();
-            String formattedMessage = "whispers to you: " + message;
-
             if (sender instanceof ConsoleSender) {
-                player.sendMessage(Component.text("Server " + formattedMessage).decorate(TextDecoration.ITALIC).color(NamedTextColor.GRAY));
+                player.sendMessage(Component.text("Server whispers to you: " + message).decorate(TextDecoration.ITALIC).color(NamedTextColor.GRAY));
                 return;
             }
 
             String senderName = ((Player) sender).getUsername();
-            sender.sendMessage(Component.text("You whisper to " + targetName + ": " + message).decorate(TextDecoration.ITALIC).color(NamedTextColor.GRAY));
-            player.sendMessage(Component.text(senderName + " " + formattedMessage).decorate(TextDecoration.ITALIC).color(NamedTextColor.GRAY));
+            sender.sendMessage(Component.text("You whisper to " + ((Player) sender).getUsername() + ": " + message).decorate(TextDecoration.ITALIC).color(NamedTextColor.GRAY));
+            player.sendMessage(Component.text(senderName + " whispers to you: " + message).decorate(TextDecoration.ITALIC).color(NamedTextColor.GRAY));
+        });
 
-        }, targetArg, messageArg);
+
 
 
     }
