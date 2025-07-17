@@ -19,7 +19,7 @@ import java.util.List;
  * Command that make a player change gamemode, made in
  * the style of the vanilla /gamemode command.
  *
- * @see <a href="https://minecraft.fandom.com/wiki/Commands/gamemode">...</a>
+ * @see <a href="https://minecraft.wiki/w/Commands/gamemode">...</a>
  */
 public class GamemodeCommand extends VanillaCommand {
 
@@ -44,9 +44,8 @@ public class GamemodeCommand extends VanillaCommand {
 
         //Command Syntax for /gamemode <gamemode> [targets]
         addSyntax((sender, context) -> {
-            List<Entity> entities = context.get(target).find(sender);
             GameMode mode = context.get(gamemode);
-
+            List<Entity> entities = context.get(target).find(sender);
             //Set the gamemode for the targets
             setGamemodeOther(sender, mode, entities);
         }, gamemode, target);
@@ -62,20 +61,25 @@ public class GamemodeCommand extends VanillaCommand {
     public void defaultor(CommandSender sender, CommandContext context) {
 
         if (hasNoArguments(context)) {
-            sender.sendMessage(Component.text("Unknown or incomplete command").color(NamedTextColor.RED)
+            sender.sendMessage(Component.translatable("command.unknown.command", NamedTextColor.RED)
                     .appendNewline()
-                    .append(Component.text(context.getInput().replace(context.getCommandName() + " ","")).color(NamedTextColor.GRAY)
-                    .append(Component.text("<--[HERE]").color(NamedTextColor.RED).decoration(TextDecoration.ITALIC,true))));
+                    .append(Component.text(context.getInput().replace(context.getCommandName() + " ",""), NamedTextColor.GRAY)
+                            .append(Component.translatable("command.context.here", NamedTextColor.RED).decoration(TextDecoration.ITALIC,true))));
             return;
         }
 
-        sender.sendMessage(Component.text("Unknown gamemode: ").color(NamedTextColor.RED)
-                .append(Component.text(context.getInput().replace(context.getCommandName() + " ","")).color(NamedTextColor.RED).decoration(TextDecoration.UNDERLINED, true)));
+        // Get the part of the input that was supposed to be the gamemode
+        String invalidInput = context.getInput().replace(context.getCommandName() + " ", "");
+
+        // Correctly create a translatable component with the placeholder filled
+        sender.sendMessage(Component.translatable("argument.gamemode.invalid",
+                Component.text(invalidInput)
+        ).color(NamedTextColor.RED));
     }
 
     private void setGamemodeSelf(CommandSender sender, GameMode gameMode) {
         if (!(sender instanceof final Player playerSender)) {
-            sender.sendMessage(Component.text("When executed from console, targets must be specified.", NamedTextColor.RED));
+            sender.sendMessage(Component.translatable("permissions.requires.player", NamedTextColor.RED));
             return;
         }
         setGamemode(playerSender, gameMode);
@@ -83,7 +87,7 @@ public class GamemodeCommand extends VanillaCommand {
 
     private void setGamemodeOther(CommandSender sender, GameMode gameMode, List<Entity> entities) {
         if (entities.isEmpty()) {
-            sender.sendMessage(Component.text("No player was found", NamedTextColor.RED));
+            sender.sendMessage(Component.translatable("argument.entity.notfound.player", NamedTextColor.RED));
             return;
         }
 
@@ -91,8 +95,6 @@ public class GamemodeCommand extends VanillaCommand {
 
             setGamemode(entity, gameMode);
         }
-
-        sender.sendMessage(Component.text("Updated gamemode:)"));
     }
 
 
@@ -100,7 +102,9 @@ public class GamemodeCommand extends VanillaCommand {
 
         final Player player = (Player) entity;
 
+        if (player.getGameMode().equals(gamemode)) return;
+
         player.setGameMode(gamemode);
-        player.sendMessage("You are now in " + gamemode.name().toLowerCase());
+        player.sendMessage(Component.translatable("gameMode.changed", Component.translatable("gameMode." + gamemode.name().toLowerCase())));
     }
 }

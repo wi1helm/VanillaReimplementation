@@ -35,15 +35,15 @@ public class SayCommand extends VanillaCommand {
 
     @Override
     public void defaultor(CommandSender sender, CommandContext context) {
-        sender.sendMessage(Component.text("Unknown or incomplete command").color(NamedTextColor.RED)
+        sender.sendMessage(Component.translatable("command.unknown.command", NamedTextColor.RED)
                 .appendNewline()
-                .append(Component.text(context.getInput().replace(context.getCommandName() + " ","")).color(NamedTextColor.GRAY)
-                        .append(Component.text("<--[HERE]").color(NamedTextColor.RED).decoration(TextDecoration.ITALIC,true))));
+                .append(Component.text(context.getInput().replace(context.getCommandName() + " ",""), NamedTextColor.GRAY)
+                        .append(Component.translatable("command.context.here", NamedTextColor.RED).decoration(TextDecoration.ITALIC,true))));
     }
 
     private void execute(CommandSender sender, CommandContext arguments) {
         if (!(sender instanceof Player player)) {
-            sender.sendMessage(Component.text("This command must be executed by a player!").color(NamedTextColor.RED));
+            sender.sendMessage(Component.translatable("permissions.requires.player", NamedTextColor.RED));
             return;
         }
         String[] messageParts = arguments.get("message");

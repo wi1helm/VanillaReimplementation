@@ -40,7 +40,7 @@ public class ListCommand extends VanillaCommand {
 
     private void listPlayers(CommandSender sender, CommandContext context, boolean uuid) {
         int onlinePlayersCount = MinecraftServer.getConnectionManager().getOnlinePlayerCount();
-        String maxPlayers = "???";
+        String maxPlayersCount = "???";
         //TODO add maxPlayerCount thingy from sever config / properties i think
 
         Collection<Player> onlinePlayers = MinecraftServer.getConnectionManager().getOnlinePlayers();
@@ -48,12 +48,13 @@ public class ListCommand extends VanillaCommand {
         List<Component> playerComponents = onlinePlayers.stream()
                 .map(player -> {
                     // Start with the player's username
-                    Component playerEntry = Component.text(player.getUsername());
+                    Component playerUsername = Component.text(player.getUsername());
+                    Component playerUUID = Component.text(player.getUuid().toString());
                     if (uuid) {
                         // If UUIDs are requested, append "(UUID)" to the username
-                        playerEntry = playerEntry.append(Component.text(" (" + player.getUuid() + ")"));
+                        playerUsername = Component.translatable("commands.list.nameAndId", playerUsername, playerUUID);
                     }
-                    return playerEntry;
+                    return playerUsername;
                 })
                 .collect(Collectors.toList());
 
@@ -62,11 +63,7 @@ public class ListCommand extends VanillaCommand {
                 playerComponents
         );
 
-        Component headerComponent = Component.text("There are ")
-                .append(Component.text(onlinePlayersCount))
-                .append(Component.text(" of a max of "))
-                .append(Component.text(maxPlayers))
-                .append(Component.text(" players online: "));
+        Component headerComponent = Component.translatable("commands.list.players", Component.text(onlinePlayersCount), Component.text(maxPlayersCount), Component.text());
 
         Component fullMessage = headerComponent.append(playerListComponent);
 

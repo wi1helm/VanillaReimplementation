@@ -40,7 +40,7 @@ public class MsgCommand extends VanillaCommand {
     private void whisperTo(CommandSender sender, List<Entity> receivers, String message) {
 
         if (receivers.isEmpty()) {
-            sender.sendMessage(Component.text("No player was found", NamedTextColor.RED));
+            sender.sendMessage(Component.translatable("argument.entity.notfound.player", NamedTextColor.RED));
             return;
         }
 
@@ -50,13 +50,13 @@ public class MsgCommand extends VanillaCommand {
             }
 
             if (sender instanceof ConsoleSender) {
-                player.sendMessage(Component.text("Server whispers to you: " + message).decorate(TextDecoration.ITALIC).color(NamedTextColor.GRAY));
+                player.sendMessage(Component.translatable("commands.message.display.incoming", Component.text("Server"), Component.text(message).decorate(TextDecoration.ITALIC).color(NamedTextColor.GRAY)));
                 return;
             }
 
             String senderName = ((Player) sender).getUsername();
-            sender.sendMessage(Component.text("You whisper to " + ((Player) sender).getUsername() + ": " + message).decorate(TextDecoration.ITALIC).color(NamedTextColor.GRAY));
-            player.sendMessage(Component.text(senderName + " whispers to you: " + message).decorate(TextDecoration.ITALIC).color(NamedTextColor.GRAY));
+            sender.sendMessage(Component.translatable("commands.message.display.outgoing", Component.text(player.getUsername()), Component.text(message)).decorate(TextDecoration.ITALIC).color(NamedTextColor.GRAY));
+            player.sendMessage(Component.translatable("commands.message.display.incoming", Component.text(senderName), Component.text(message)).decorate(TextDecoration.ITALIC).color(NamedTextColor.GRAY));
         });
 
 
@@ -71,9 +71,9 @@ public class MsgCommand extends VanillaCommand {
 
     @Override
     protected void defaultor(CommandSender sender, CommandContext context) {
-        sender.sendMessage(Component.text("Unknown or incomplete command").color(NamedTextColor.RED)
+        sender.sendMessage(Component.translatable("command.unknown.command", NamedTextColor.RED)
                 .appendNewline()
-                .append(Component.text(context.getInput().replace(context.getCommandName() + " ","")).color(NamedTextColor.GRAY)
-                        .append(Component.text("<--[HERE]").color(NamedTextColor.RED).decoration(TextDecoration.ITALIC,true))));
+                .append(Component.text(context.getInput().replace(context.getCommandName() + " ",""), NamedTextColor.GRAY)
+                        .append(Component.translatable("command.context.here", NamedTextColor.RED).decoration(TextDecoration.ITALIC,true))));
     }
 }

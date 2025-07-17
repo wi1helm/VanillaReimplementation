@@ -39,9 +39,7 @@ public class HelpCommand extends VanillaCommand {
             VanillaCommand targetCommand = VanillaCommandsFeature.getRegisteredCommands().get(commandName);
 
             if (targetCommand == null) {
-                sender.sendMessage(Component.text("Unknown command: '").color(NamedTextColor.RED)
-                        .append(Component.text(context.getInput()).color(NamedTextColor.RED).decorate(TextDecoration.UNDERLINED))
-                        .append(Component.text("'")).color(NamedTextColor.RED));
+                sender.sendMessage(Component.translatable("commands.help.failed", NamedTextColor.RED));
                 return;
             }
 
@@ -58,14 +56,12 @@ public class HelpCommand extends VanillaCommand {
      */
     private void viewUsage(@NotNull CommandSender sender, CommandContext context, @Nullable VanillaCommand command) {
         if (command == null) {
-            sender.sendMessage(Component.text("Internal error: Command instance is null.").color(NamedTextColor.RED));
             return;
         }
 
         Component usage = command.usage(sender, context);
 
         if (usage == null) {
-            sender.sendMessage(Component.text("Usage not found for this command.").color(NamedTextColor.RED));
             return;
         }
         sender.sendMessage(usage);
@@ -81,23 +77,14 @@ public class HelpCommand extends VanillaCommand {
     }
 
     public void defaultor(CommandSender sender, CommandContext context) {
-        if (hasNoArguments(context)) {
+        sender.sendMessage(Component.text("=== Help ==="));
 
-            sender.sendMessage(Component.text("=== Help ==="));
+        List<VanillaCommand> commands = new ArrayList<>(VanillaCommandsFeature.getRegisteredCommands().values());
 
-            List<VanillaCommand> commands = new ArrayList<>(VanillaCommandsFeature.getRegisteredCommands().values());
+        commands.sort(this::compareCommands);
 
-            commands.sort(this::compareCommands);
+        commands.forEach(command -> sender.sendMessage(Component.text("/" + command.getName().toLowerCase())));
 
-            commands.forEach(command -> sender.sendMessage(Component.text("/" + command.getName().toLowerCase())));
-
-            sender.sendMessage(Component.text("============"));
-
-            return;
-        }
-
-        sender.sendMessage(Component.text("Unknown command: '").color(NamedTextColor.RED)
-                .append(Component.text(context.getInput()).color(NamedTextColor.RED).decorate(TextDecoration.UNDERLINED))
-                .append(Component.text("'")).color(NamedTextColor.RED));
+        sender.sendMessage(Component.text("============"));
     }
 }

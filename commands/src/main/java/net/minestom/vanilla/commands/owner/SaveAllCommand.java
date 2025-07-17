@@ -26,9 +26,11 @@ public class SaveAllCommand extends VanillaCommand {
 
     @Override
     public void defaultor(CommandSender sender, CommandContext context) {
+        sender.sendMessage(Component.translatable("commands.save.saving"));
         MinecraftServer.getInstanceManager().getInstances().forEach(i -> {
             i.saveChunksToStorage();
             Logger.info("Saved dimension " + i.getDimensionType().name());
         });
+        sender.sendMessage(Component.translatable("commands.save.success"));
     }
 }

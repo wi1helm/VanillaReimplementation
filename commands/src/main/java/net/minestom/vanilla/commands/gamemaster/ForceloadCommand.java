@@ -76,7 +76,7 @@ public class ForceloadCommand extends VanillaCommand {
 
     private void usageAddFrom(CommandSender sender, CommandContext context) {
         if (!(sender instanceof Player player)) {
-            sender.sendMessage("This command must be executed by a player!");
+            sender.sendMessage(Component.translatable("permissions.requires.player", NamedTextColor.RED));
             return;
         }
         RelativeVec fromVec = context.get("from");
@@ -93,7 +93,7 @@ public class ForceloadCommand extends VanillaCommand {
 
     private void usageAddFromTo(CommandSender sender, CommandContext context) {
         if (!(sender instanceof Player player)) {
-            sender.sendMessage("This command must be executed by a player!");
+            sender.sendMessage(Component.translatable("permissions.requires.player", NamedTextColor.RED));
             return;
         }
         RelativeVec fromVec = context.get("from");
@@ -120,7 +120,7 @@ public class ForceloadCommand extends VanillaCommand {
 
     private void usageRemoveFrom(CommandSender sender, CommandContext context) {
         if (!(sender instanceof Player player)) {
-            sender.sendMessage("This command must be executed by a player!");
+            sender.sendMessage(Component.translatable("permissions.requires.player", NamedTextColor.RED));
             return;
         }
         RelativeVec fromVec = context.get("from");
@@ -138,7 +138,7 @@ public class ForceloadCommand extends VanillaCommand {
 
     private void usageRemoveFromTo(CommandSender sender, CommandContext context) {
         if (!(sender instanceof Player player)) {
-            sender.sendMessage("This command must be executed by a player!");
+            sender.sendMessage(Component.translatable("permissions.requires.player", NamedTextColor.RED));
             return;
         }
         RelativeVec fromVec = context.get("from");
@@ -176,9 +176,9 @@ public class ForceloadCommand extends VanillaCommand {
 
     @Override
     public void defaultor(CommandSender sender, CommandContext context) {
-        sender.sendMessage(Component.text("Unknown or incomplete command").color(NamedTextColor.RED)
+        sender.sendMessage(Component.translatable("command.unknown.command", NamedTextColor.RED)
                 .appendNewline()
-                .append(Component.text(context.getInput().replace(context.getCommandName() + " ","")).color(NamedTextColor.GRAY)
-                        .append(Component.text("<--[HERE]").color(NamedTextColor.RED).decoration(TextDecoration.ITALIC,true))));
+                .append(Component.text(context.getInput().replace(context.getCommandName() + " ",""), NamedTextColor.GRAY)
+                        .append(Component.translatable("command.context.here", NamedTextColor.RED).decoration(TextDecoration.ITALIC,true))));
     }
 }

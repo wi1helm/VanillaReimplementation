@@ -5,6 +5,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.command.CommandSender;
+import net.minestom.server.command.ConsoleSender;
 import net.minestom.server.command.builder.CommandContext;
 import net.minestom.server.command.builder.arguments.ArgumentType;
 import net.minestom.server.command.builder.arguments.minecraft.ArgumentEntity;
@@ -21,7 +22,6 @@ public class OpCommand extends VanillaCommand {
         setCondition(permission(LEVEL_ALL));
 
         ArgumentEntity target = ArgumentType.Entity("target").onlyPlayers(true);
-
         setDefaultExecutor(this::defaultor);
 
         addSyntax((sender, context) -> {
@@ -33,7 +33,7 @@ public class OpCommand extends VanillaCommand {
 
     private void setOp(CommandSender sender, CommandContext context, List<Entity> entities) {
         if (entities.isEmpty()) {
-            sender.sendMessage(Component.text("No player was found", NamedTextColor.RED));
+            sender.sendMessage(Component.translatable("argument.entity.notfound.player",NamedTextColor.RED));
             return;
         }
 
@@ -42,16 +42,23 @@ public class OpCommand extends VanillaCommand {
             final Player player = (Player) entity;
 
             if (player.getPermissionLevel() >= LEVEL_GAMEMASTER) {
-                player.sendMessage(Component.text("Nothing changed. The player is already operator").color(NamedTextColor.RED));
+                player.sendMessage(Component.translatable("commands.op.failed").color(NamedTextColor.RED));
+                return;
+            }
+            // Todo make so permission level is based on server config (https://minecraft.wiki/w/Permission_level#Java_Edition_2)
+            player.setPermissionLevel(LEVEL_OWNER);
+            player.refreshCommands();
+
+            if (sender instanceof ConsoleSender) {
+                MinecraftServer.getConnectionManager().getOnlinePlayers().stream()
+                        .filter(p -> player.getPermissionLevel() >= LEVEL_GAMEMASTER) // Filter for players with operator permission
+                        .forEach(p -> player.sendMessage(Component.text("[Server: ").append(Component.translatable("commands.op.success", Component.text(player.getUsername()))).color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, true)));
                 return;
             }
 
-            player.setPermissionLevel(LEVEL_GAMEMASTER);
-            player.refreshCommands();
-
             MinecraftServer.getConnectionManager().getOnlinePlayers().stream()
                     .filter(p -> player.getPermissionLevel() >= LEVEL_GAMEMASTER) // Filter for players with operator permission
-                    .forEach(p -> player.sendMessage(Component.text("[Server: Made " + player.getUsername() + " a server operator]").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, true))); // Send the constructed message
+                    .forEach(p -> player.sendMessage(Component.translatable("commands.op.success", Component.text(player.getUsername()))));
 
         }
     }
@@ -64,9 +71,9 @@ public class OpCommand extends VanillaCommand {
 
     @Override
     public void defaultor(CommandSender sender, CommandContext context) {
-        sender.sendMessage(Component.text("Unknown or incomplete command").color(NamedTextColor.RED)
+        sender.sendMessage(Component.translatable("command.unknown.argument").color(NamedTextColor.RED)
                 .appendNewline()
-                .append(Component.text(context.getInput().replace(context.getCommandName() + " ","")).color(NamedTextColor.GRAY)
-                        .append(Component.text("<--[HERE]").color(NamedTextColor.RED).decoration(TextDecoration.ITALIC,true))));
+                .append(Component.text(context.getCommandName()).color(NamedTextColor.RED).decoration(TextDecoration.UNDERLINED, true))
+                .append(Component.translatable("command.context.here", NamedTextColor.RED).decoration(TextDecoration.ITALIC,true)));
     }
 }

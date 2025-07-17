@@ -11,9 +11,6 @@ import net.minestom.server.command.builder.arguments.ArgumentType;
 import net.minestom.server.world.Difficulty;
 import net.minestom.vanilla.commands.VanillaCommand;
 
-/**
- * Command that make an instance change difficulty
- */
 public class DifficultyCommand extends VanillaCommand {
 
     public DifficultyCommand() {
@@ -49,9 +46,12 @@ public class DifficultyCommand extends VanillaCommand {
             return;
         }
 
-        sender.sendMessage(Component.text("Unknown difficulty: ").color(NamedTextColor.RED)
-                .append(Component.text(context.getInput().replace(context.getCommandName() + " ","")).color(NamedTextColor.RED).decoration(TextDecoration.UNDERLINED, true)));
-
+        sender.sendMessage(Component.translatable("command.unknown.argument").color(NamedTextColor.RED)
+                .appendNewline()
+                .append(Component.text("...ifficulty").color(NamedTextColor.GRAY))
+                .appendSpace()
+                .append(Component.text(context.getInput().replace(context.getCommandName() + " ","")).color(NamedTextColor.RED).decoration(TextDecoration.UNDERLINED, true))
+                .append(Component.translatable("command.context.here", NamedTextColor.RED).decoration(TextDecoration.ITALIC,true)));
 
     }
 
@@ -60,12 +60,12 @@ public class DifficultyCommand extends VanillaCommand {
         Difficulty current = MinecraftServer.getDifficulty();
 
         if (current == difficulty) {
-            sender.sendMessage(Component.text("Difficulty already set to " + difficulty.name().toLowerCase()).color(NamedTextColor.RED));
+            sender.sendMessage(Component.translatable("commands.difficulty.failure", Component.translatable("options.difficulty." + difficulty.name().toLowerCase())).color(NamedTextColor.RED));
             return;
         }
 
         MinecraftServer.setDifficulty(difficulty);
-        sender.sendMessage(Component.text("You are now playing in " + difficulty.name().toLowerCase()));
+        sender.sendMessage(Component.translatable("commands.difficulty.success", Component.translatable("options.difficulty." + difficulty.name().toLowerCase())));
     }
 }
 
